@@ -1,0 +1,8 @@
+node_modules/
+dist/
+key.pem
+.env
+*.tgz
+*.log
+.DS_Store
+run-with-wallet.sh

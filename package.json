@@ -1,0 +1,52 @@
+{
+  "name": "vedetta-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Vedetta — pay-per-call crypto sentiment, divergence verdicts, and live analyst reads over x402 (USDC on Base). No signup, no API key: payment is authentication.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc && node -e \"require('fs').chmodSync('dist/index.js', 0o755)\"",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "modelcontextprotocol",
+    "x402",
+    "crypto",
+    "sentiment",
+    "market-intelligence",
+    "usdc",
+    "base",
+    "pay-per-call",
+    "ai-agents"
+  ],
+  "author": "Vedetta <vedetta@dethboy.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@x402/core": "^2.20.0",
+    "@x402/evm": "^2.20.0",
+    "@x402/fetch": "^2.20.0",
+    "viem": "^2.55.10",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "typescript": "^7.0.2"
+  },
+  "mcpName": "com.dethboy/vedetta",
+  "type": "module",
+  "bin": {
+    "vedetta-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "server.json"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "homepage": "https://vedetta.dethboy.com"
+}

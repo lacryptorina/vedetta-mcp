@@ -1,0 +1,44 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.dethboy/vedetta",
+  "description": "Pay-per-call crypto sentiment, divergence verdicts, and live analyst reads over x402 - USDC on Base, no signup, no API key. Bring your own wallet; payment is authentication.",
+  "repository": {
+    "url": "https://github.com/lacryptorina/vedetta-mcp",
+    "source": "github"
+  },
+  "websiteUrl": "https://vedetta.dethboy.com",
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "vedetta-mcp",
+      "version": "1.0.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "EVM_PRIVATE_KEY",
+          "description": "Hex private key of the wallet paying USDC on Base (x402). Optional: without it, paid tools return the live 402 offer instead of paying. Use a dedicated low-balance wallet.",
+          "isRequired": false,
+          "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "VEDETTA_API_URL",
+          "description": "API base URL override (default https://vedetta.dethboy.com)",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "string"
+        },
+        {
+          "name": "VEDETTA_MAX_PRICE_USD",
+          "description": "Global price-cap override in USD; replaces the per-route listed-price caps",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}
