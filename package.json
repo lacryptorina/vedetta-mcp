@@ -1,7 +1,7 @@
 {
   "name": "vedetta-mcp",
-  "version": "1.0.0",
-  "description": "MCP server for Vedetta — pay-per-call crypto sentiment, divergence verdicts, and live analyst reads over x402 (USDC on Base). No signup, no API key: payment is authentication.",
+  "version": "1.1.0",
+  "description": "MCP server for Vedetta — pay-per-call crypto sentiment, divergence verdicts, and live analyst reads over x402 (USDC on Base). Descriptive market analysis only — not financial advice.",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc && node -e \"require('fs').chmodSync('dist/index.js', 0o755)\"",
@@ -48,5 +48,12 @@
   "engines": {
     "node": ">=20"
   },
-  "homepage": "https://vedetta.dethboy.com"
+  "homepage": "https://vedetta.dethboy.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lacryptorina/vedetta-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lacryptorina/vedetta-mcp/issues"
+  }
 }

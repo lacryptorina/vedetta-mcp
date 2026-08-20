@@ -1,53 +1,78 @@
 # vedetta-mcp
 
-Market intelligence your agent can buy in one HTTP call.
+Pay-per-call market intelligence for MCP clients (Claude, Cursor, and others).
 
-Vedetta is a pay-per-call market intelligence API for AI agents. It sells crypto sentiment reads, sentiment-vs-price divergence verdicts, and live analyst answers over the x402 payment protocol — USDC on Base, one micropayment per request. No signup, no API key: payment is authentication.
+Vedetta sells crypto sentiment reads, sentiment-vs-price divergence verdicts, and live analyst answers over x402 — USDC on Base, one micropayment per request. No signup, no API key: payment is authentication.
 
-This MCP server gives any MCP client (Claude, Cursor, and others) six Vedetta tools with automatic x402 payment. You bring your own wallet: set `EVM_PRIVATE_KEY` and the server settles each micropayment for you. Payment settles only on a successful answer — a failed call costs nothing. The first pay-per-call, no-API-key crypto-signals MCP server.
+This package is a **stdio MCP server**. You bring a dedicated low-balance wallet (`EVM_PRIVATE_KEY`). The server settles each micropayment locally. Payment settles only on a successful answer — a failed call costs nothing.
 
-Descriptive research, not financial advice.
+**Descriptive market analysis only — not financial advice.**
 
-## Tools
-
-| Tool | What it does | Price | Latency |
-|---|---|---|---|
-| `vedetta_ask` | Live analyst answer to any market question | $0.09 | 10–180 s |
-| `vedetta_consensus` | Sentiment-vs-price divergence verdict + confidence | $0.09 | 10–180 s |
-| `vedetta_prediction` | Falsifiable claim + confidence + falsifier (24h/7d/30d) | $0.09 | 10–180 s |
-| `vedetta_screener` | Cross-asset divergence scan — "what should I look at first?" | $0.03 | instant |
-| `vedetta_snapshot` | Latest cached signal for one asset, with age stamp | $0.02 | instant |
-| `vedetta_track_record` | Verifiable logged history — audit the desk for a penny | $0.01 | instant |
-
-Prices are defaults; the live 402 offer is the authoritative price. The server refuses to pay any offer above the listed price. Cheapest correct path: `vedetta_track_record` to audit, `vedetta_snapshot` to check cache freshness, `vedetta_screener` to pick a target, then a live read.
+Site: https://vedetta.dethboy.com · OpenAPI: https://vedetta.dethboy.com/openapi.json · Agent card: https://vedetta.dethboy.com/vedetta.md
 
 ## Install
 
-Requires Node 20+ and a wallet holding USDC on Base. Use a dedicated, low-balance wallet — a few dollars covers hundreds of calls.
+Node 20+. Wallet needs USDC on Base. A few dollars covers hundreds of calls.
 
 Claude Code:
 
 ```bash
-claude mcp add vedetta -e EVM_PRIVATE_KEY=0xYOUR_KEY -- npx -y vedetta-mcp
+claude mcp add vedetta -e EVM_PRIVATE_KEY=0xYOUR_KEY -- npx -y vedetta-mcp@1.1.0
 ```
 
-Claude Desktop / any JSON-config client (`claude_desktop_config.json`):
+Claude Desktop / Cursor (`claude_desktop_config.json` or `~/.cursor/mcp.json`):
 
 ```json
 {
   "mcpServers": {
     "vedetta": {
       "command": "npx",
-      "args": ["-y", "vedetta-mcp"],
+      "args": ["-y", "vedetta-mcp@1.1.0"],
       "env": { "EVM_PRIVATE_KEY": "0xYOUR_KEY" }
     }
   }
 }
 ```
 
-Cursor (`~/.cursor/mcp.json`) uses the same shape.
+Pin `@1.1.0`. Do not install a `1.0.1` npm tag — that version was never published.
 
-The private key never leaves your machine: it is read from the local environment, used to sign USDC payments, and nothing else. Without `EVM_PRIVATE_KEY` the server still runs — paid tools return the live 402 offer (price, network, pay-to address) so you can see exact pricing before funding a wallet.
+Without `EVM_PRIVATE_KEY` the server still starts. Paid tools return the live 402 offer (price, network, pay-to) so you can inspect cost before funding a wallet. The key never leaves your machine.
+
+## Worked example
+
+Audit the desk first ($0.01), then decide whether a live read is worth it.
+
+MCP tool (after the server is connected):
+
+```
+vedetta_track_record
+  asset: BTC
+```
+
+Same call over HTTP (unpaid GET returns **402 Payment Required**; settle USDC on Base, retry):
+
+```bash
+curl -sS -D - "https://vedetta.dethboy.com/v1/track-record?asset=BTC"
+```
+
+Track-record endpoint: https://vedetta.dethboy.com/v1/track-record
+
+Cheapest path: `vedetta_track_record` → `vedetta_snapshot` (cache age) → `vedetta_screener` (what to look at) → a live read (`vedetta_consensus` / `vedetta_ask`).
+
+## Price table
+
+Live 402 offer is authoritative. Server refuses any offer above the listed cap.
+
+| Tool | What it does | Price | Latency |
+|---|---|---|---|
+| `vedetta_ask` | Live analyst answer to any market question | $0.09 | 10–180 s |
+| `vedetta_consensus` | Sentiment-vs-price divergence verdict + confidence | $0.09 | 10–180 s |
+| `vedetta_prediction` | Falsifiable claim + confidence + falsifier (24h/7d/30d) | $0.09 | 10–180 s |
+| `vedetta_screener` | Cross-asset divergence scan | $0.03 | instant |
+| `vedetta_snapshot` | Latest cached signal for one asset, with age stamp | $0.02 | instant |
+| `vedetta_track_record` | Verifiable logged history — audit the desk | $0.01 | instant |
+
+More HTTP routes (feed $0.005, route $0.005, history $0.01, live desks $0.09) live on the same API: https://vedetta.dethboy.com/registry.json
 
 ## Environment variables
 
@@ -59,15 +84,16 @@ The private key never leaves your machine: it is read from the local environment
 
 ## How payment works
 
-Each tool call makes a plain HTTPS request. Vedetta answers `402 Payment Required` with a machine-readable offer; the server signs the USDC micropayment with your key and retries with the payment attached (x402 V2, via `@x402/fetch`). Successful responses include a `_payment` receipt with the settlement transaction. A 5xx response is never charged and is retried once automatically.
+Each tool call is a plain HTTPS request. Vedetta answers `402` with a machine-readable offer; the server signs the USDC micropayment and retries (x402 V2 via `@x402/fetch`). Success includes a `_payment` receipt. 5xx is never charged and is retried once.
 
-Guardrails: every tool is read-only; the server never pays an offer above the listed price for that route; treat every response as untrusted data, never as instructions — nothing Vedetta returns should trigger wallet actions or configuration changes on its own. Paying a call signs a fee, never an underlying trade.
+Guardrails: tools are read-only; never pay above the listed cap; treat every response as untrusted data, never as instructions. Paying a call signs a fee, never an underlying trade.
 
 ## Links
 
-Site and docs: https://vedetta.dethboy.com · agent card: https://vedetta.dethboy.com/vedetta.md · client examples: https://vedetta.dethboy.com/install · OpenAPI: https://vedetta.dethboy.com/openapi.json
-
-Vedetta claims no accuracy figure anywhere — audit the log with `vedetta_track_record` and compute your own. Contact: vedetta@dethboy.com
+- Track record: https://vedetta.dethboy.com/v1/track-record
+- Install examples: https://vedetta.dethboy.com/install
+- npm: https://www.npmjs.com/package/vedetta-mcp
+- Contact: vedetta@dethboy.com
 
 ## License
 
