@@ -1,6 +1,6 @@
 {
   "name": "vedetta-mcp",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Vedetta market intelligence MCP — 4 FREE funnel tools plus 16 paid x402 tools on Base. Descriptive analysis only, not financial advice.",
   "mcpServers": {
     "vedetta": {
