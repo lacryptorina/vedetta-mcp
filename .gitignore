@@ -6,3 +6,4 @@ key.pem
 *.log
 .DS_Store
 run-with-wallet.sh
+.npmrc

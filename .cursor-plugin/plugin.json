@@ -1,0 +1,11 @@
+{
+  "name": "vedetta-mcp",
+  "description": "Vedetta pay-per-call market intelligence for MCP clients — 4 FREE funnel tools (feed/route/snapshot/track-record) plus 16 paid analytical tools via x402 USDC on Base. Descriptive market analysis only — not financial advice.",
+  "version": "2.0.1",
+  "author": {
+    "name": "Vedetta"
+  },
+  "homepage": "https://vedetta.dethboy.com",
+  "repository": "https://github.com/lacryptorina/vedetta-mcp",
+  "license": "MIT"
+}

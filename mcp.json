@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "vedetta": {
+      "command": "npx",
+      "args": ["-y", "vedetta-mcp@latest"]
+    }
+  }
+}

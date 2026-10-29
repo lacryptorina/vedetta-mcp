@@ -1,0 +1,21 @@
+# Smithery config — https://smithery.ai/docs
+# Boots published npm package over stdio with empty config so the scanner
+# can initialize + tools/list all 20 tools (4 FREE + 16 paid) without keys.
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    required: []
+    properties:
+      EVM_PRIVATE_KEY:
+        type: string
+        description: Optional Base USDC wallet key for settling paid x402 tools. Leave empty for free-funnel + 402 offers.
+  commandFunction: |-
+    (config) => ({
+      command: 'npx',
+      args: ['-y', 'vedetta-mcp@latest'],
+      env: {
+        ...(config.EVM_PRIVATE_KEY ? { EVM_PRIVATE_KEY: config.EVM_PRIVATE_KEY } : {})
+      }
+    })
+  exampleConfig: {}

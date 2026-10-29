@@ -11,15 +11,14 @@
  */
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { privateKeyToAccount } from "viem/accounts";
-import {
-  wrapFetchWithPaymentFromConfig,
-  decodePaymentResponseHeader,
-  type PaymentRequirements,
-} from "@x402/fetch";
-import { decodePaymentRequiredHeader } from "@x402/core/http";
-import { ExactEvmScheme } from "@x402/evm";
 import type { Ledger } from "./ledger.js";
+
+/** Minimal 402 offer shape — payment libs are loaded lazily only when a tool is called. */
+interface PaymentRequirements {
+  amount: string;
+  network: string;
+  payTo: string;
+}
 
 export const BASE_URL = (process.env.VEDETTA_API_URL ?? "https://vedetta.dethboy.com").replace(/\/+$/, "");
 const USDC_DECIMALS = 6;
@@ -204,7 +203,7 @@ export const ROUTES: Record<string, RouteSpec> = {
 };
 
 // ---------------------------------------------------------------------------
-// x402 payment plumbing
+// x402 payment plumbing (lazy — never loaded during initialize / tools/list)
 // ---------------------------------------------------------------------------
 
 function normalizeKey(raw: string): `0x${string}` {
@@ -212,9 +211,9 @@ function normalizeKey(raw: string): `0x${string}` {
   return (k.startsWith("0x") ? k : `0x${k}`) as `0x${string}`;
 }
 
-const account = process.env.EVM_PRIVATE_KEY
-  ? privateKeyToAccount(normalizeKey(process.env.EVM_PRIVATE_KEY))
-  : undefined;
+function hasWalletKey(): boolean {
+  return Boolean(process.env.EVM_PRIVATE_KEY?.trim());
+}
 
 function usdToAtomic(usd: number): bigint {
   return BigInt(Math.round(usd * 10 ** USDC_DECIMALS));
@@ -224,20 +223,31 @@ function atomicToUsd(amount: string): string {
   return (Number(amount) / 10 ** USDC_DECIMALS).toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
 }
 
-function makePayFetch(capUsd: number): typeof fetch {
-  if (!account) return fetch;
+async function makePayFetch(capUsd: number): Promise<typeof fetch> {
+  const key = process.env.EVM_PRIVATE_KEY?.trim();
+  if (!key) return fetch;
+
+  const [{ privateKeyToAccount }, { wrapFetchWithPaymentFromConfig }, { ExactEvmScheme }] =
+    await Promise.all([
+      import("viem/accounts"),
+      import("@x402/fetch"),
+      import("@x402/evm"),
+    ]);
+
+  const account = privateKeyToAccount(normalizeKey(key));
   const capAtomic = usdToAtomic(capUsd);
+  // PaymentPolicy typing is internal to @x402/fetch; keep filter shape identical to prior sync path.
   return wrapFetchWithPaymentFromConfig(fetch, {
     schemes: [{ network: "eip155:*", client: new ExactEvmScheme(account) }],
     policies: [
-      (_v: number, reqs: PaymentRequirements[]) =>
+      ((_v: number, reqs: Array<{ amount: string }>) =>
         reqs.filter(r => {
           try {
             return BigInt(r.amount) <= capAtomic;
           } catch {
             return false;
           }
-        }),
+        })) as never,
     ],
   }) as typeof fetch;
 }
@@ -247,11 +257,12 @@ export interface CallResult {
   text: string;
 }
 
-function describe402(res: Response, body: unknown): string {
+async function describe402(res: Response, body: unknown): Promise<string> {
   let offer: PaymentRequirements | undefined;
   const header = res.headers.get("PAYMENT-REQUIRED");
   if (header) {
     try {
+      const { decodePaymentRequiredHeader } = await import("@x402/core/http");
       offer = decodePaymentRequiredHeader(header).accepts?.[0] as PaymentRequirements | undefined;
     } catch {
       /* fall through to body */
@@ -264,7 +275,7 @@ function describe402(res: Response, body: unknown): string {
   if (!offer) return "Payment required (402), but the offer could not be parsed.";
   return [
     `Payment required: $${atomicToUsd(offer.amount)} USDC on ${offer.network} → ${offer.payTo}.`,
-    account
+    hasWalletKey()
       ? "The server wallet could not settle this payment. Check its USDC balance on Base (an empty wallet aborts payment client-side)."
       : "No EVM_PRIVATE_KEY configured — the server cannot pay. Set EVM_PRIVATE_KEY to a funded Base USDC wallet to enable paid calls.",
   ].join(" ");
@@ -277,7 +288,7 @@ export async function callVedetta(route: RouteSpec, params: Record<string, strin
     if (v !== undefined && v !== "") url.searchParams.set(k, v);
   }
   const timeoutMs = route.live ? LIVE_TIMEOUT_MS : CACHED_TIMEOUT_MS;
-  const payFetch = makePayFetch(capUsd);
+  const payFetch = await makePayFetch(capUsd);
 
   const attempt = async (): Promise<Response> =>
     payFetch(url.toString(), {
@@ -309,7 +320,7 @@ export async function callVedetta(route: RouteSpec, params: Record<string, strin
     body = bodyText;
   }
 
-  if (res.status === 402) return { ok: false, text: describe402(res, body) };
+  if (res.status === 402) return { ok: false, text: await describe402(res, body) };
   if (!res.ok) {
     return {
       ok: false,
@@ -322,6 +333,7 @@ export async function callVedetta(route: RouteSpec, params: Record<string, strin
   const payHeader = res.headers.get("PAYMENT-RESPONSE");
   if (payHeader) {
     try {
+      const { decodePaymentResponseHeader } = await import("@x402/fetch");
       const receipt = decodePaymentResponseHeader(payHeader);
       out._payment = {
         settled: true,
@@ -355,6 +367,13 @@ export function buildMcpServer(opts: BuildServerOptions = {}): McpServer {
 
   const server = new McpServer({ name: "vedetta", version: "2.0.1" });
 
+  // Unconditionally register every route. tools/list must never depend on
+  // wallets, env vars, network, or payment libs (Glama / Smithery cold inspect).
+  const routeEntries = Object.entries(ROUTES);
+  if (routeEntries.length !== 20) {
+    throw new Error(`vedetta-mcp expected 20 routes, got ${routeEntries.length}`);
+  }
+
   const liveAnnotations = {
     readOnlyHint: true,
     destructiveHint: false,
@@ -363,7 +382,7 @@ export function buildMcpServer(opts: BuildServerOptions = {}): McpServer {
   };
   const cachedAnnotations = { ...liveAnnotations, idempotentHint: true };
 
-  for (const [slug, route] of Object.entries(ROUTES)) {
+  for (const [slug, route] of routeEntries) {
     const priceLabel = route.capUsd <= 0
       ? "FREE"
       : `$${route.capUsd.toFixed(route.capUsd < 1 ? 3 : 2).replace(/0+$/, "").replace(/\.$/, "")} USDC`;

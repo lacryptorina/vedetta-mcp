@@ -16,19 +16,22 @@
  *    Ledger ops: `vedetta-mcp ledger issue|add|balance|list`.
  *
  * All output is descriptive research, not financial advice.
+ *
+ * Cold-start contract for directory inspectors (Glama / Smithery):
+ * initialize, ping, and tools/list must answer over stdio with zero env vars
+ * and without loading payment libs or making HTTP calls.
  */
 
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { Ledger } from "./ledger.js";
 import { buildMcpServer } from "./routes.js";
-import { startHttpServer } from "./httpServer.js";
 
 function parsePort(raw: string | undefined, fallback: number): number {
   const n = Number(raw);
   return Number.isInteger(n) && n > 0 && n < 65536 ? n : fallback;
 }
 
-function ledgerCmd(argv: string[]): void {
+async function ledgerCmd(argv: string[]): Promise<void> {
+  const { Ledger } = await import("./ledger.js");
   const [sub, ...rest] = argv;
   const ledger = new Ledger();
 
@@ -87,11 +90,15 @@ async function main(): Promise<void> {
   const args = process.argv.slice(2);
 
   if (args[0] === "ledger") {
-    ledgerCmd(args.slice(1));
+    await ledgerCmd(args.slice(1));
     return;
   }
 
   if (args.includes("--http")) {
+    const [{ Ledger }, { startHttpServer }] = await Promise.all([
+      import("./ledger.js"),
+      import("./httpServer.js"),
+    ]);
     const port = parsePort(process.env.PORT ?? process.env.VEDETTA_PORT, 8310);
     const markupPct = Number(process.env.VEDETTA_MARKUP_PCT ?? "30");
     const host = process.env.VEDETTA_HOST || "127.0.0.1";
@@ -104,7 +111,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  // default: stdio (BYO-wallet)
+  // default: stdio (BYO-wallet) — connect before any network / payment work
   const server = buildMcpServer();
   const transport = new StdioServerTransport();
   await server.connect(transport);
