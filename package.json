@@ -1,11 +1,13 @@
 {
   "name": "vedetta-mcp",
-  "version": "1.1.0",
-  "description": "MCP server for Vedetta — pay-per-call crypto sentiment, divergence verdicts, and live analyst reads over x402 (USDC on Base). Descriptive market analysis only — not financial advice.",
+  "version": "2.0.1",
+  "description": "MCP server for Vedetta \u2014 4 FREE funnel tools (feed/route/snapshot/track-record) plus 16 paid analytical tools via x402 USDC on Base ($0.01\u2013$0.09). Descriptive market analysis only \u2014 not financial advice.",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc && node -e \"require('fs').chmodSync('dist/index.js', 0o755)\"",
     "start": "node dist/index.js",
+    "start:http": "node dist/index.js --http",
+    "ledger": "node dist/index.js ledger",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run build"
   },

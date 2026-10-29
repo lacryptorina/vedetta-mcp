@@ -1,18 +1,18 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.dethboy/vedetta",
-  "description": "x402 pay-per-call crypto sentiment, divergence & analyst reads. USDC on Base. NFA.",
+  "description": "x402 crypto sentiment & analyst reads. 4 FREE funnel + 16 paid ($0.01\u2013$0.09) USDC on Base. NFA.",
   "repository": {
     "url": "https://github.com/lacryptorina/vedetta-mcp",
     "source": "github"
   },
   "websiteUrl": "https://vedetta.dethboy.com",
-  "version": "1.1.0",
+  "version": "2.0.1",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "vedetta-mcp",
-      "version": "1.1.0",
+      "version": "2.0.1",
       "transport": {
         "type": "stdio"
       },
