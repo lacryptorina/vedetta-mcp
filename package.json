@@ -1,7 +1,7 @@
 {
   "name": "vedetta-mcp",
-  "version": "2.0.1",
-  "description": "MCP server for Vedetta \u2014 4 FREE funnel tools (feed/route/snapshot/track-record) plus 16 paid analytical tools via x402 USDC on Base ($0.01\u2013$0.09). Descriptive market analysis only \u2014 not financial advice.",
+  "version": "2.0.2",
+  "description": "MCP server for Vedetta — 4 FREE funnel tools (feed/route/snapshot/track-record) plus 16 paid analytical tools via x402 USDC on Base ($0.01–$0.09). Descriptive market analysis only — not financial advice.",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc && node -e \"require('fs').chmodSync('dist/index.js', 0o755)\"",
