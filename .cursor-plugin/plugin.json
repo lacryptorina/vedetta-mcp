@@ -1,7 +1,7 @@
 {
   "name": "vedetta-mcp",
-  "description": "Vedetta pay-per-call market intelligence for MCP clients \u2014 4 FREE funnel tools (feed/route/snapshot/track-record) plus 16 paid analytical tools via x402 USDC on Base. Descriptive market analysis only \u2014 not financial advice.",
-  "version": "2.0.3",
+  "description": "Vedetta MCP \u2014 FREE route + korra calls/news/lean; paid funnel $0.07 + desk ladder $0.01\u2013$0.09 USDC on Base. NFA.",
+  "version": "2.0.4",
   "author": {
     "name": "Vedetta"
   },

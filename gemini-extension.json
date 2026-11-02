@@ -1,11 +1,14 @@
 {
   "name": "vedetta-mcp",
-  "version": "2.0.3",
-  "description": "Vedetta market intelligence MCP — 4 FREE funnel tools plus 16 paid x402 tools on Base. Descriptive analysis only, not financial advice.",
+  "version": "2.0.4",
+  "description": "Vedetta MCP \u2014 FREE route + korra calls/news/lean; paid funnel $0.07 + desk ladder $0.01\u2013$0.09 USDC on Base. NFA.",
   "mcpServers": {
     "vedetta": {
       "command": "npx",
-      "args": ["-y", "vedetta-mcp@latest"]
+      "args": [
+        "-y",
+        "vedetta-mcp@latest"
+      ]
     }
   }
 }
