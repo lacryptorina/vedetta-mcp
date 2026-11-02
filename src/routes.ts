@@ -388,7 +388,7 @@ export interface BuildServerOptions {
 export function buildMcpServer(opts: BuildServerOptions = {}): McpServer {
   const { ledger, token, markupPct = 0 } = opts;
 
-  const server = new McpServer({ name: "vedetta", version: "2.0.4" });
+  const server = new McpServer({ name: "vedetta", version: "2.0.5" });
 
   // Unconditionally register every route. tools/list must never depend on
   // wallets, env vars, network, or payment libs (Glama / Smithery cold inspect).
