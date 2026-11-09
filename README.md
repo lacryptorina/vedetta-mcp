@@ -6,9 +6,9 @@ Pay-per-call market intelligence for MCP clients (Claude, Cursor, Gemini CLI, Cl
 
 Vedetta sells crypto sentiment reads, sentiment-vs-price divergence verdicts, and live analyst answers over x402 — USDC on Base, one micropayment per paid request. No signup, no API key on paid routes: payment is authentication.
 
-**Product shape (gateway 2.14.0):** FREE tools (`200 OK`, IP rate-limited): `route`, `korra-calls`, `korra-news`, `korra-lean`. Paid funnel `feed`/`snapshot`/`track-record` at **$0.07**; history **$0.01**, screener **$0.03**, live desk **$0.09**. Hosted `/mcp` (if used) stays Bearer-token gated.
+**Product shape (gateway 2.14.1):** FREE tools (`200 OK`, IP rate-limited): `route`, `track-record`, `korra-calls`, `korra-news`, `korra-lean`. Paid funnel `feed`/`snapshot` at **$0.01**; history **$0.01**, screener **$0.03**, live desk **$0.09**. Hosted `/mcp` (if used) stays Bearer-token gated.
 
-This package is a **stdio MCP server**. You bring a dedicated low-balance wallet (`EVM_PRIVATE_KEY`) for paid tools. The server settles each micropayment locally. Payment settles only on a successful answer — a failed call costs nothing. Free tools never require a wallet. Directory inspectors (Glama / Smithery) get all **20** tools from `tools/list` with empty env.
+This package is a **stdio MCP server**. You bring a dedicated low-balance wallet (`EVM_PRIVATE_KEY`) for paid tools. The server settles each micropayment locally. Payment settles only on a successful answer — a failed call costs nothing. Free tools never require a wallet. Directory inspectors (Glama / Smithery) get all **23** tools from `tools/list` with empty env.
 
 **Descriptive market analysis only — not financial advice.**
 
@@ -69,7 +69,7 @@ curl -sS "https://vedetta.dethboy.com/v1/korra/news?asset=BTC"
 curl -sS "https://vedetta.dethboy.com/v1/korra/lean?asset=BTC"
 ```
 
-Cheapest paid path: funnel `vedetta_snapshot`/$0.07 → `vedetta_history` ($0.01) / `vedetta_screener` ($0.03) → live `vedetta_consensus` / `vedetta_ask` ($0.09).
+Cheapest paid path: funnel `vedetta_snapshot`/$0.01 → `vedetta_history` ($0.01) / `vedetta_screener` ($0.03) → live `vedetta_consensus` / `vedetta_ask` ($0.09).
 
 ## Price table
 
@@ -77,13 +77,13 @@ Live 402 offer is authoritative for paid routes. Server refuses any offer above 
 
 | Tool | What it does | Price | Latency |
 |---|---|---|---|
-| `vedetta_feed` | Desk post stream | $0.07 | instant |
+| `vedetta_feed` | Desk post stream | $0.01 | instant |
 | `vedetta_route` | Task → endpoint router | **FREE** | instant |
-| `vedetta_korra-calls` | Korra open/resolved calls | **FREE** | instant |
+| `vedetta_korra-calls` | Korra open/resolved calls (open_calls redacted) | **FREE** | instant |
 | `vedetta_korra-news` | Korra scored news | **FREE** | instant |
-| `vedetta_korra-lean` | Korra lean gauges | **FREE** | instant |
-| `vedetta_snapshot` | Cached signal + staleness | $0.07 | instant |
-| `vedetta_track-record` | Verifiable call log | $0.07 | instant |
+| `vedetta_korra-lean` | Korra lean gauges (non-FEAR_GREED teaser) | **FREE** | instant |
+| `vedetta_snapshot` | Cached signal + staleness | $0.01 | instant |
+| `vedetta_track-record` | Verifiable call log | **FREE** | instant |
 | `vedetta_history` | Signal time-series | $0.01 | instant |
 | `vedetta_screener` | Cross-asset divergence scan | $0.03 | instant |
 | `vedetta_ask` | Live analyst answer | $0.09 | 10–180 s |
