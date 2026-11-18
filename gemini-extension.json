@@ -1,7 +1,7 @@
 {
   "name": "vedetta-mcp",
-  "version": "2.0.6",
-  "description": "Vedetta MCP \u2014 FREE route + track-record + korra; feed/snapshot $0.01 + desk $0.01\u2013$0.09 USDC on Base. NFA.",
+  "version": "2.0.7",
+  "description": "Vedetta MCP \u2014 FREE route + track-record + korra; feed/snap/hist $0.01; screener $0.03; desk $0.09 USDC on Base. NFA.",
   "mcpServers": {
     "vedetta": {
       "command": "npx",

@@ -1,6 +1,6 @@
 {
   "name": "vedetta-mcp",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "MCP server for Vedetta \u2014 FREE route + track-record + korra calls/news/lean; paid funnel feed/snapshot $0.01; history $0.01; screener $0.03; live desk $0.09 via x402 USDC on Base. Descriptive market analysis only \u2014 not financial advice.",
   "main": "dist/index.js",
   "scripts": {
@@ -9,7 +9,8 @@
     "start:http": "node dist/index.js --http",
     "ledger": "node dist/index.js ledger",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "publish:registry": "bash scripts/publish_mcp_registry.sh"
   },
   "keywords": [
     "mcp",
