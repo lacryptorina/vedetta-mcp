@@ -3,7 +3,7 @@ dist
 .git
 .npmrc
 key.pem
-.env
+.env*
 *.tgz
 *.log
 .DS_Store
