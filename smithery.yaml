@@ -1,6 +1,6 @@
 # Smithery config — https://smithery.ai/docs
 # Boots published npm package over stdio with empty config so the scanner
-# can initialize + tools/list all 20 tools (4 FREE + 16 paid) without keys.
+# can initialize + tools/list all 23 tools (1 FREE + 22 paid) without keys.
 startCommand:
   type: stdio
   configSchema:

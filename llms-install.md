@@ -1,6 +1,6 @@
 # Install vedetta-mcp in Cline
 
-Add the Vedetta MCP server to Cline. Node.js 20+ is required. **No environment variables are required** for the four FREE funnel tools (`vedetta_feed`, `vedetta_route`, `vedetta_snapshot`, `vedetta_track-record`). Optional buyer env vars unlock the 16 paid x402 tools.
+Add the Vedetta MCP server to Cline. Node.js 20+ is required. **No environment variables are required** for the FREE audit tool (`vedetta_track-record`); every other tool shows its live 402 offer without a wallet. Optional buyer env vars unlock the 22 paid x402 tools (8 cached at $0.01, 14 live desk at $0.05).
 
 ## Cline MCP settings (single block)
 
@@ -21,7 +21,7 @@ Merge this into the existing `mcpServers` object in Cline MCP settings. Do not r
 
 ## Optional env (paid tools only)
 
-Only needed when you want the server to settle x402 micropayments from a local wallet. Free funnel tools work without these.
+Only needed when you want the server to settle x402 micropayments from a local wallet. The FREE track-record tool works without these; paid tools return the live 402 offer.
 
 | Variable | Required for free tools | Purpose |
 |---|---|---|

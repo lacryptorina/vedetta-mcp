@@ -1,7 +1,7 @@
 {
   "name": "vedetta-mcp",
-  "version": "2.0.8",
-  "description": "MCP server for Vedetta — FREE route + track-record + korra calls/news/lean; paid funnel feed/snapshot $0.01; history $0.01; screener $0.03; live desk $0.09 via x402 USDC on Base. Descriptive market analysis only — not financial advice.",
+  "version": "2.0.9",
+  "description": "MCP server for Vedetta — FREE track-record audit log; cached feed/snapshot/history/screener/route/korra calls/news/lean $0.01; 14 live desk routes $0.05 via x402 USDC on Base. Descriptive market analysis only — not financial advice.",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc && node -e \"require('fs').chmodSync('dist/index.js', 0o755)\"",

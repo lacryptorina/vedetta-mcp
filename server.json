@@ -1,18 +1,18 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.dethboy/vedetta",
-  "description": "FREE route+track-record+korra; feed/snap/hist $0.01; screener $0.03; desk $0.09. NFA.",
+  "description": "FREE track-record; cached feed/snap/hist/screener/route/korra $0.01; 14 live desks $0.05. NFA.",
   "repository": {
     "url": "https://github.com/lacryptorina/vedetta-mcp",
     "source": "github"
   },
   "websiteUrl": "https://vedetta.dethboy.com",
-  "version": "2.0.7",
+  "version": "2.0.9",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "vedetta-mcp",
-      "version": "2.0.7",
+      "version": "2.0.9",
       "transport": {
         "type": "stdio"
       },
